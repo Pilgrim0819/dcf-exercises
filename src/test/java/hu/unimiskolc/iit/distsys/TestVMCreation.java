@@ -23,7 +23,13 @@
 
 package hu.unimiskolc.iit.distsys;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
 import hu.mta.sztaki.lpds.cloud.simulator.Timed;
+import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
 import hu.unimiskolc.iit.distsys.forwarders.IaaSForwarder;
 import hu.unimiskolc.iit.distsys.forwarders.PMForwarder;
@@ -37,7 +43,11 @@ public class TestVMCreation {
 
 	@Before
 	public void initVMC() throws ClassNotFoundException,
-			InstantiationException, IllegalAccessException {
+			InstantiationException, IllegalAccessException, IOException {
+		
+		//Properties props = System.getProperties();
+		System.setProperty("hu.unimiskolc.iit.distsys.VMC","hu.unimiskolc.iit.distsys.VMCreation");
+		
 		Timed.resetTimed();
 		ExercisesBase.reset();
 		vmc = VMCreatorFactory.createApproachesExercise();
