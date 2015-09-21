@@ -1,6 +1,7 @@
 package hu.unimiskolc.iit.distsys;
 
 import hu.mta.sztaki.lpds.cloud.simulator.Timed;
+import hu.mta.sztaki.lpds.cloud.simulator.iaas.IaaSService;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine.ResourceAllocation;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
@@ -61,6 +62,8 @@ public class VMCreation implements VMCreationApproaches{
 		pm.turnon();
 		
 		Timed.simulateUntilLastEvent();
+		
+		IaaSService iaas = ExercisesBase.getNewIaaSService();
 	}
 	@Override
 	public void migratedVMCreation() throws Exception{
