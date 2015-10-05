@@ -22,10 +22,12 @@
  */
 package hu.unimiskolc.iit.distsys;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import hu.mta.sztaki.lpds.cloud.simulator.Timed;
@@ -39,6 +41,15 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.AlterableResourceCons
 import hu.unimiskolc.iit.distsys.interfaces.FillInAllPMs;
 
 public class TestRoundRobinJobSched {
+	
+	@Before
+	public void init() throws ClassNotFoundException,
+			InstantiationException, IllegalAccessException, IOException {
+		
+		//Properties props = System.getProperties();
+		System.setProperty("hu.unimiskolc.iit.distsys.PMFiller","hu.unimiskolc.iit.distsys.Pm10Vm100");
+	}
+	
 	@Test(timeout = 10000)
 	public void testRRWithPMFiller() throws Exception {
 		final int requestedVMcount = 100;

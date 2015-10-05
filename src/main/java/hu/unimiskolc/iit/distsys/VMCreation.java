@@ -10,6 +10,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.constraints.ResourceConstraints;
 import hu.mta.sztaki.lpds.cloud.simulator.io.Repository;
 import hu.mta.sztaki.lpds.cloud.simulator.io.StorageObject;
 import hu.mta.sztaki.lpds.cloud.simulator.io.VirtualAppliance;
+import hu.unimiskolc.iit.distsys.interfaces.VMCreationApproaches;
 
 public class VMCreation implements VMCreationApproaches{
 	@Override
@@ -72,7 +73,7 @@ public class VMCreation implements VMCreationApproaches{
 	}
 	@Override
 	public void migratedVMCreation() throws Exception{
-		PhysicalMachine pm = ExercisesBase.getNewPhysicalMachine();
+		/*PhysicalMachine pm = ExercisesBase.getNewPhysicalMachine();
 		pm.turnon();
 		
 		Timed.simulateUntilLastEvent();
@@ -87,6 +88,29 @@ public class VMCreation implements VMCreationApproaches{
 		ConstantConstraints requested = new ConstantConstraints(1, 100, 4096);
 		
 		pm2.requestVM(va, requested, pm.localDisk, 1);
+		Timed.simulateUntilLastEvent();*/
+		
+		PhysicalMachine pmInitial = ExercisesBase.getNewPhysicalMachine();
+		PhysicalMachine pmTarget = ExercisesBase.getNewPhysicalMachine();
+		pmInitial.turnon();
+		pmTarget.turnon();
+		Timed.simulateUntilLastEvent();
+		VirtualAppliance va = new VirtualAppliance("VAID", 10, 0, false,
+				100000000l);
+		pmInitial.localDisk.registerObject(va);
+		ConstantConstraints migratingCaps = new ConstantConstraints(Math.min(
+				pmInitial.getCapacities().getRequiredCPUs(), pmTarget
+						.getCapacities().getRequiredCPUs()), Math.min(pmInitial
+				.getCapacities().getRequiredProcessingPower(), pmTarget
+				.getCapacities().getRequiredProcessingPower()), Math.min(
+				pmInitial.getCapacities().getRequiredMemory(), pmTarget
+						.getCapacities().getRequiredMemory()));
+		VirtualMachine vm = pmInitial.requestVM(va, migratingCaps,
+				pmInitial.localDisk, 1)[0];
+		Timed.simulateUntilLastEvent();
+		ResourceAllocation ra = pmTarget.allocateResources(migratingCaps, true,
+				PhysicalMachine.migrationAllocLen * 1000);
+		vm.migrate(ra);
 		Timed.simulateUntilLastEvent();
 	}
 
