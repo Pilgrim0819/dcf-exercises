@@ -33,6 +33,7 @@ import hu.mta.sztaki.lpds.cloud.simulator.iaas.PhysicalMachine;
 import hu.mta.sztaki.lpds.cloud.simulator.iaas.VirtualMachine;
 import hu.unimiskolc.iit.distsys.forwarders.IaaSForwarder;
 import hu.unimiskolc.iit.distsys.forwarders.PMForwarder;
+import hu.unimiskolc.iit.distsys.interfaces.VMCreationApproaches;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,7 +51,7 @@ public class TestVMCreation {
 		
 		Timed.resetTimed();
 		ExercisesBase.reset();
-		vmc = VMCreatorFactory.createApproachesExercise();
+		vmc = TestCreatorFactory.createApproachesExercise();
 	}
 
 	@Test(timeout = 100)
