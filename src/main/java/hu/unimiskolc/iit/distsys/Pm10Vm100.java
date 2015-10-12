@@ -55,17 +55,49 @@ public class Pm10Vm100 implements FillInAllPMs{
 			if(i<vmCount-iaas.machines.size()){
 				cc = new ConstantConstraints(maxCPU/10.0, maxprocessing, maxmemory/10);
 			}else{
+				System.out.println("maxCPU: "+maxCPU);
 				cc = new ConstantConstraints(maxCPU, maxprocessing, maxmemory);
 			}
 			
 			try{
-				vms = iaas.requestVM(va, cc, repo, 1);
-				System.out.println(vms[0].getState());
-				Timed.simulateUntilLastEvent();
-				System.out.println(vms[0].getState());
+				do{
+					vms = iaas.requestVM(va, cc, repo, 1);
+					System.out.println(vms[0].getState());
+					Timed.simulateUntilLastEvent();
+					System.out.println(vms[0].getState());
+					
+					if(vms[0].getState()!=State.NONSERVABLE){
+						cc = new ConstantConstraints(maxCPU/10.0/2, maxprocessing, maxmemory/10);
+					}
+					
+					if(vms[0].getState()!=State.DESTROYED){
+						cc = new ConstantConstraints(maxCPU/10.0/2, maxprocessing, maxmemory/10);
+					}
+				}while(vms[0].getState()!=State.RUNNING);
 			}catch(Exception e){
 				System.out.println(e);
 			}
 		}
+		
+		/*for(PhysicalMachine pm : iaas.machines){
+			ResourceConstraints rc = pm.getCapacities();
+			cc = new ConstantConstraints(CPUs/10, processing/10, memory/10);
+			
+			System.out.println(pm.freeCapacities.getRequiredCPUs());
+			
+			try{
+				vms = iaas.requestVM(va, cc, repo, vmCount/iaas.machines.size());
+				Timed.simulateUntilLastEvent();
+				
+				System.out.println("after: "+pm.freeCapacities.getRequiredCPUs());
+				System.out.println("VMs: "+pm.listVMs());
+				
+				//for(int i=0;i<vms.length;i++){
+					//vms[i].newComputeTask(total, limit, e);
+				//}
+			}catch(Exception e){
+				System.out.println(e);
+			}
+		}*/
 	}
 }
