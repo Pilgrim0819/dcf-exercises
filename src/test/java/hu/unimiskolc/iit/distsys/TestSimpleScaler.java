@@ -42,6 +42,8 @@ import org.junit.Test;
 public class TestSimpleScaler {
 	@Test(timeout = 10000)
 	public void testCase() throws Exception {
+		System.setProperty("hu.unimiskolc.iit.distsys.RRJSched","hu.unimiskolc.iit.distsys.RRJSched");
+		
 		// Preparing the IaaS
 		final IaaSService myIaaS = ExercisesBase.getComplexInfrastructure(100);
 		Repository r = myIaaS.repositories.get(0);
