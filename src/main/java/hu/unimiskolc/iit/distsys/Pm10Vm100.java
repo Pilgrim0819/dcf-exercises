@@ -1,6 +1,9 @@
 package hu.unimiskolc.iit.distsys;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 import org.junit.Assert;
 
@@ -28,76 +31,66 @@ public class Pm10Vm100 implements FillInAllPMs{
 		double maxCPU = 0.0;
 		double maxprocessing = 0.0;
 		long maxmemory = 0;
+		
+		double minCPU = Double.MAX_VALUE;
+		double minprocessing = Double.MAX_VALUE;
+		long minmemory = Long.MAX_VALUE;
+		
 		Repository repo = iaas.repositories.get(0);
 		Collection<StorageObject> sos = iaas.repositories.get(0).contents();
 		StorageObject so = sos.iterator().next();
 		VirtualAppliance va = (VirtualAppliance)so;
+		ResourceConstraints allCaps = iaas.getCapacities();
+		
 		
 		for(PhysicalMachine pm : iaas.machines){
-			System.out.println(pm.freeCapacities.getRequiredCPUs());
+			ResourceConstraints capacities = pm.getCapacities();
+			
+			maxCPU = Math.max(maxCPU, capacities.getRequiredCPUs());
+			maxprocessing = Math.max(maxprocessing, capacities.getRequiredProcessingPower());
+			maxmemory = Math.max(maxmemory, capacities.getRequiredMemory());
+			
+			minCPU = Math.min(minCPU, capacities.getRequiredCPUs());
+			minprocessing = Math.min(minprocessing, capacities.getRequiredProcessingPower());
+			minmemory = Math.min(minmemory, capacities.getRequiredMemory());
 		}
 		
 		
 		System.out.println("----------");
 		
-		for(int i=0;i<vmCount;i++){
-			maxCPU = 0.0;
-			for(PhysicalMachine pm : iaas.machines){
-				if(pm.freeCapacities.getRequiredCPUs()>maxCPU){
-					maxCPU = pm.freeCapacities.getRequiredCPUs();
-					maxmemory = pm.freeCapacities.getRequiredMemory();
-					maxprocessing = pm.freeCapacities.getRequiredProcessingPower();
+		//cc = new ConstantConstraints(allCaps.getRequiredCPUs()/vmCount, maxprocessing, maxmemory/vmCount);
+		cc = new ConstantConstraints(allCaps.getRequiredCPUs()/vmCount, minprocessing, minmemory/vmCount);
+			
+		try{
+			iaas.requestVM(va, cc, repo, vmCount - iaas.machines.size());
+			Timed.simulateUntilLastEvent();
+			
+			ArrayList<PhysicalMachine> pms = new ArrayList<PhysicalMachine>(iaas.machines);
+			
+			Collections.sort(pms, new Comparator<PhysicalMachine>(){
+				public int compare(PhysicalMachine pm1, PhysicalMachine pm2){
+					Double diff = Math.signum(pm1.freeCapacities.getTotalProcessingPower()-pm2.freeCapacities.getTotalProcessingPower());
+					return diff.intValue();
 				}
-			}
+			});
 			
-			System.out.println(maxCPU);
 			
-			if(i<vmCount-iaas.machines.size()){
-				cc = new ConstantConstraints(maxCPU/10.0, maxprocessing, maxmemory/10);
-			}else{
-				System.out.println("maxCPU: "+maxCPU);
-				cc = new ConstantConstraints(maxCPU, maxprocessing, maxmemory);
-			}
-			
-			try{
-				do{
-					vms = iaas.requestVM(va, cc, repo, 1);
-					System.out.println(vms[0].getState());
-					Timed.simulateUntilLastEvent();
-					System.out.println(vms[0].getState());
-					
-					if(vms[0].getState()!=State.NONSERVABLE){
-						cc = new ConstantConstraints(maxCPU/10.0/2, maxprocessing, maxmemory/10);
-					}
-					
-					if(vms[0].getState()!=State.DESTROYED){
-						cc = new ConstantConstraints(maxCPU/10.0/2, maxprocessing, maxmemory/10);
-					}
-				}while(vms[0].getState()!=State.RUNNING);
-			}catch(Exception e){
-				System.out.println(e);
-			}
-		}
+			for(PhysicalMachine pm : pms){
+				ConstantConstraints cc2 = new ConstantConstraints(
+						//Trick from teacher
+						pm.freeCapacities.getRequiredCPUs()*
+						pm.getCapacities().getRequiredProcessingPower()/
+						pm.freeCapacities.getRequiredProcessingPower(),
+						pm.freeCapacities.getRequiredProcessingPower(),
+						pm.freeCapacities.getRequiredMemory());
 		
-		/*for(PhysicalMachine pm : iaas.machines){
-			ResourceConstraints rc = pm.getCapacities();
-			cc = new ConstantConstraints(CPUs/10, processing/10, memory/10);
-			
-			System.out.println(pm.freeCapacities.getRequiredCPUs());
-			
-			try{
-				vms = iaas.requestVM(va, cc, repo, vmCount/iaas.machines.size());
+				iaas.requestVM(va, cc2, repo, 1);
 				Timed.simulateUntilLastEvent();
 				
-				System.out.println("after: "+pm.freeCapacities.getRequiredCPUs());
-				System.out.println("VMs: "+pm.listVMs());
-				
-				//for(int i=0;i<vms.length;i++){
-					//vms[i].newComputeTask(total, limit, e);
-				//}
-			}catch(Exception e){
-				System.out.println(e);
+				System.out.println("Done.");
 			}
-		}*/
+		}catch(Exception e){
+			System.out.println(e);
+		}
 	}
 }

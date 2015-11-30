@@ -50,7 +50,7 @@ public class TestRoundRobinJobSched {
 		System.setProperty("hu.unimiskolc.iit.distsys.PMFiller","hu.unimiskolc.iit.distsys.Pm10Vm100");
 	}
 	
-	@Test(timeout = 10000)
+	@Test//(timeout = 10000)
 	public void testRRWithPMFiller() throws Exception {
 		final int requestedVMcount = 100;
 		// Preparing the IaaS

@@ -50,6 +50,8 @@ public class TestHighAvailability {
 
 	@Test(timeout = 30000)
 	public void hatest() throws Exception {
+		System.setProperty("hu.unimiskolc.iit.distsys.RRJSched","hu.unimiskolc.iit.distsys.RRJSched");
+		
 		int[] successCounters = new int[availabilityLevels.length];
 		int[] totalCounters = new int[availabilityLevels.length];
 		final IaaSService myIaaS = ExercisesBase.getComplexInfrastructure(100);

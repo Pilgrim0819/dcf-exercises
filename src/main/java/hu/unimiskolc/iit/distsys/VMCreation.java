@@ -73,23 +73,6 @@ public class VMCreation implements VMCreationApproaches{
 	}
 	@Override
 	public void migratedVMCreation() throws Exception{
-		/*PhysicalMachine pm = ExercisesBase.getNewPhysicalMachine();
-		pm.turnon();
-		
-		Timed.simulateUntilLastEvent();
-		
-		PhysicalMachine pm2 = ExercisesBase.getNewPhysicalMachine();
-		pm2.turnon();
-		
-		Timed.simulateUntilLastEvent();
-		
-		VirtualAppliance va = new VirtualAppliance("2", 1, 0);
-		pm2.localDisk.registerObject(va);
-		ConstantConstraints requested = new ConstantConstraints(1, 100, 4096);
-		
-		pm2.requestVM(va, requested, pm.localDisk, 1);
-		Timed.simulateUntilLastEvent();*/
-		
 		PhysicalMachine pmInitial = ExercisesBase.getNewPhysicalMachine();
 		PhysicalMachine pmTarget = ExercisesBase.getNewPhysicalMachine();
 		pmInitial.turnon();

@@ -122,7 +122,7 @@ public class TestVMCreation {
 		}
 	}
 
-	@Test(timeout = 100)
+	@Test//(timeout = 100)
 	public void throughMigrationApproach() throws Exception {
 		int beforePMSize = ExercisesBase.pmforwarders.size();
 		vmc.migratedVMCreation();
