@@ -19,25 +19,18 @@ public class CustomProvider implements CloudProvider, VMManager.CapacityChangeEv
 	public double getPerTickQuote(ResourceConstraints rc){
 		int pmcount = ia.machines.size();
 		double energyConsumption=0;
-		double processed=0;
 		int numOfVms=0;
 		double total =0;
 		double utilization=ia.getRunningCapacities().getTotalProcessingPower()/ia.getCapacities().getTotalProcessingPower();
-		double basePrice = 0.001;
-		double electricity = 45 / 3600000000.0;
+		double basePrice = 1;
 		
 		for(PhysicalMachine pm : ia.machines){
 			energyConsumption += pm.getPerTickProcessingPower();
-			energyConsumption = energyConsumption*electricity;
-			processed += pm.getTotalProcessed();
 			numOfVms += pm.numofCurrentVMs();
-			total += processed/numOfVms*energyConsumption;
+			total += rc.getRequiredCPUs()*basePrice*utilization*numOfVms;
 		}
 		
-		energyConsumption = energyConsumption/pmcount;
-		total = energyConsumption*(processed/numOfVms);
-		
-		return total/utilization;
+		return total;
 	}
 	
 	@Override
